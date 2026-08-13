@@ -24,6 +24,8 @@ export default function Home() {
   const [published, setPublished] = useState<{gameUrl:string;editUrl:string;referralUrl:string;referralCode:string}|null>(null);
   const [referredBy, setReferredBy] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("https://www.youtube.com/watch?v=jfKfPfyJRdk");
+  const [occasion,setOccasion]=useState("anniversary");
+  const [memories,setMemories]=useState(["วันแรกที่เราเจอกัน","ทริปที่ชอบที่สุด","สิ่งที่อยากบอกวันนี้"]);
 
   const activeTheme = useMemo(() => themes.find((item) => item.id === theme)!, [theme]);
   const youtubeId = useMemo(() => {
@@ -45,7 +47,7 @@ export default function Home() {
     else {
       setPublishing(true); setPublishError("");
       try {
-        const response = await fetch("/api/games", { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({ creatorName:creator, partnerName:partner, message, theme, youtubeUrl, memories:["วันแรกที่เราเจอกัน", "ทริปที่ชอบที่สุด", "สิ่งที่อยากบอกวันนี้"], referredBy }) });
+        const response = await fetch("/api/games", { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({ creatorName:creator, partnerName:partner, message, theme, youtubeUrl, memories, occasion, referredBy }) });
         if(response.status===401){window.location.href="/api/auth/google?returnTo=/";return;}
         const data = await response.json() as {gameUrl:string;editUrl:string;referralUrl:string;referralCode:string;error?:string};
         if(!response.ok) throw new Error(data.error || "สร้างเกมไม่สำเร็จ");
@@ -101,20 +103,16 @@ export default function Home() {
                 <label>ข้อความเปิดเรื่อง<textarea value={message} maxLength={90} onChange={(e) => setMessage(e.target.value)} /><small>{message.length}/90</small></label>
                 <div className="occasion-row">
                   <p>โอกาสพิเศษ</p>
-                  <div className="chips"><button className="selected">วันครบรอบ</button><button>วันเกิด</button><button>บอกรัก</button></div>
+                  <div className="chips">{[{id:"anniversary",label:"วันครบรอบ"},{id:"birthday",label:"วันเกิด"},{id:"confession",label:"บอกรัก"},{id:"apology",label:"ง้อ/ขอโทษ"},{id:"valentine",label:"วาเลนไทน์"}].map(o=><button type="button" key={o.id} className={occasion===o.id?"selected":""} onClick={()=>setOccasion(o.id)}>{o.label}</button>)}</div>
                 </div>
               </div>
             )}
 
             {step === 1 && (
               <div className="step-content">
-                <div className="section-title"><span>02</span><div><h2>ซ่อนความทรงจำ</h2><p>สร้างหัวใจ 3 ดวงให้คนพิเศษออกตามหา</p></div></div>
-                {["วันแรกที่เราเจอกัน", "ทริปที่ชอบที่สุด", "สิ่งที่อยากบอกวันนี้"].map((item, index) => (
-                  <button className={`memory-card ${memory === index ? "selected" : ""}`} onClick={() => setMemory(index)} key={item}>
-                    <span className="pixel-heart">♥</span><div><small>MEMORY 0{index + 1}</small><strong>{item}</strong></div><span>›</span>
-                  </button>
-                ))}
-                <button className="add-memory">＋ เพิ่มความทรงจำ</button>
+                <div className="section-title"><span>02</span><div><h2>ซ่อนความทรงจำ</h2><p>เพิ่มได้สูงสุด 10 จุด แต่ละจุดแก้ข้อความหรือลบได้</p></div></div>
+                {memories.map((item,index)=><div className={`memory-editor ${memory===index?"selected":""}`} key={index} onClick={()=>setMemory(index)}><span className="pixel-heart">♥</span><label><small>MEMORY {String(index+1).padStart(2,"0")}</small><textarea value={item} maxLength={120} onChange={e=>setMemories(x=>x.map((v,i)=>i===index?e.target.value:v))}/></label><button type="button" aria-label="ลบความทรงจำ" disabled={memories.length<=1} onClick={e=>{e.stopPropagation();setMemories(x=>x.filter((_,i)=>i!==index));setMemory(0)}}>×</button></div>)}
+                <button type="button" className="add-memory" disabled={memories.length>=10} onClick={()=>{setMemories(x=>[...x,`ความทรงจำที่ ${x.length+1}`]);setMemory(memories.length)}}>＋ เพิ่มความทรงจำ ({memories.length}/10)</button>
               </div>
             )}
 
@@ -136,7 +134,7 @@ export default function Home() {
             {step === 3 && (
               <div className="step-content publish-step">
                 <div className="section-title"><span>04</span><div><h2>พร้อมส่งความรู้สึก</h2><p>ตรวจดูเกมครั้งสุดท้าย แล้วสร้างลิงก์ได้เลย</p></div></div>
-                <div className="ready-card"><span>✓</span><div><strong>เกมของคุณพร้อมแล้ว!</strong><p>3 ความทรงจำ · {activeTheme.name} · เพลง 8-bit</p></div></div>
+                <div className="ready-card"><span>✓</span><div><strong>เกมของคุณพร้อมแล้ว!</strong><p>{memories.length} ความทรงจำ · {activeTheme.name} · {occasion==="birthday"?"วันเกิด":occasion==="apology"?"ง้อ/ขอโทษ":occasion==="confession"?"บอกรัก":occasion==="valentine"?"วาเลนไทน์":"วันครบรอบ"}</p></div></div>
                 <label>ชื่อเกม<input defaultValue={`ภารกิจหัวใจของ${partner}`} /></label>
                 <label className="link-label">ลิงก์เกม<div className="link-box"><span>heartquest.fun/q/</span><input defaultValue="our-favorite-level" /></div></label>
               </div>
