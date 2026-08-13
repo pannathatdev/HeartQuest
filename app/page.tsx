@@ -10,14 +10,18 @@ const themes = [
 
 const steps = ["เรื่องราว", "ความทรงจำ", "ตกแต่ง", "เผยแพร่"];
 
-type QuestStage={id:string;type:"npc"|"key"|"collect"|"quiz"|"ending";title:string;question?:string;answer?:string;decoys?:string[]};
-type GameCategory="all"|"story"|"memory"|"puzzle"|"finale";
-const gameCategories=[{id:"all",icon:"✦",name:"ทั้งหมด"},{id:"story",icon:"📖",name:"เนื้อเรื่อง"},{id:"memory",icon:"💗",name:"ความทรงจำ"},{id:"puzzle",icon:"🧩",name:"พัซเซิล"},{id:"finale",icon:"🎉",name:"ฉากจบ"}] as const;
+type QuestStage={id:string;type:"npc"|"key"|"collect"|"quiz"|"match"|"timeline"|"catch"|"rhythm"|"ending";title:string;question?:string;answer?:string;decoys?:string[]};
+type GameCategory="all"|"story"|"memory"|"puzzle"|"action"|"finale";
+const gameCategories=[{id:"all",icon:"✦",name:"ทั้งหมด"},{id:"story",icon:"📖",name:"เนื้อเรื่อง"},{id:"memory",icon:"💗",name:"ความทรงจำ"},{id:"puzzle",icon:"🧩",name:"พัซเซิล"},{id:"action",icon:"⚡",name:"แอ็กชัน"},{id:"finale",icon:"🎉",name:"ฉากจบ"}] as const;
 const stageCatalog=[
   {type:"npc",category:"story",icon:"💬",name:"คุยกับ NPC",description:"รับคำใบ้และเปิดเรื่องราว",tone:"violet"},
   {type:"collect",category:"memory",icon:"💗",name:"ล่าหัวใจ",description:"เดินสำรวจและเก็บความทรงจำ",tone:"pink"},
   {type:"key",category:"puzzle",icon:"🔑",name:"กล่องกุญแจ",description:"เลือกกล่องเพื่อหากุญแจลับ",tone:"gold"},
   {type:"quiz",category:"puzzle",icon:"?",name:"คำถามวัดใจ",description:"สร้างคำถามและตัวเลือกเอง",tone:"blue"},
+  {type:"match",category:"memory",icon:"🃏",name:"จับคู่ความทรงจำ",description:"เปิดการ์ดและตามหาคู่ที่ตรงกัน",tone:"violet"},
+  {type:"timeline",category:"memory",icon:"🗓️",name:"เรียงไทม์ไลน์",description:"แตะเหตุการณ์ตามลำดับเรื่องราว",tone:"gold"},
+  {type:"catch",category:"action",icon:"💞",name:"ฝนหัวใจ",description:"แตะหัวใจที่ปรากฏให้ครบก่อนผ่าน",tone:"pink"},
+  {type:"rhythm",category:"action",icon:"🎵",name:"จังหวะหัวใจ",description:"แตะตามจังหวะให้หัวใจเต้นพร้อมกัน",tone:"blue"},
   {type:"ending",category:"finale",icon:"✨",name:"คำสารภาพสุดท้าย",description:"เปิดข้อความลับและคำตอบพิเศษ",tone:"rose"},
 ] as const;
 
