@@ -1,0 +1,3 @@
+import { env } from "cloudflare:workers";import { redirect } from "next/navigation";import { requireAdmin } from "../../../lib/admin";import AdminData from "./AdminData";
+export const dynamic="force-dynamic";
+export default async function Page(){if(!await requireAdmin())redirect("/admin/login");const [users,games]=await Promise.all([env.DB.prepare("SELECT id,email,display_name,heart_points,created_at FROM users ORDER BY created_at DESC LIMIT 200").all(),env.DB.prepare("SELECT id,slug,creator_name,partner_name,play_count,completion_count,created_at FROM games ORDER BY created_at DESC LIMIT 200").all()]);return <AdminData users={users.results as never[]} games={games.results as never[]}/>}
