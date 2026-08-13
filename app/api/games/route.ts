@@ -21,8 +21,9 @@ export async function POST(request: Request) {
     const referredBy = clean(body.referredBy, 20) || null;
     const now = Date.now();
     const occasion=["anniversary","birthday","confession","apology","valentine"].includes(clean(body.occasion,20))?clean(body.occasion,20):"anniversary";
-    await env.DB.prepare("INSERT INTO games (id, slug, edit_token, creator_name, partner_name, message, theme, youtube_url, memories_json, referral_code, referred_by, created_at, owner_user_id, occasion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-      .bind(id, slug, editToken, creatorName, partnerName, message, clean(body.theme, 20) || "sunset", clean(body.youtubeUrl, 300) || null, JSON.stringify(memories), referralCode, referredBy, now, user.id, occasion).run();
+    const allowed=new Set(["npc","key","collect","quiz","ending"]);const questPlan=Array.isArray(body.questPlan)?body.questPlan.slice(0,8).map((s:any)=>({id:clean(s?.id,50)||crypto.randomUUID(),type:allowed.has(clean(s?.type,20))?clean(s.type,20):"collect",title:clean(s?.title,80),question:clean(s?.question,140),answer:clean(s?.answer,80),decoys:Array.isArray(s?.decoys)?s.decoys.slice(0,3).map((x:unknown)=>clean(x,80)):[]})):[];
+    await env.DB.prepare("INSERT INTO games (id, slug, edit_token, creator_name, partner_name, message, theme, youtube_url, memories_json, referral_code, referred_by, created_at, owner_user_id, occasion, quest_plan_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+      .bind(id, slug, editToken, creatorName, partnerName, message, clean(body.theme, 20) || "sunset", clean(body.youtubeUrl, 300) || null, JSON.stringify(memories), referralCode, referredBy, now, user.id, occasion, JSON.stringify(questPlan)).run();
     if (referredBy) await env.DB.prepare("INSERT INTO referral_events (id, referral_code, created_game_id, points, created_at) VALUES (?, ?, ?, 1, ?)").bind(crypto.randomUUID(), referredBy, id, now).run();
     const origin = new URL(request.url).origin;
     return Response.json({ slug, gameUrl: `${origin}/q/${slug}`, editUrl: `${origin}/edit/${editToken}`, referralUrl: `${origin}/?ref=${referralCode}`, referralCode });

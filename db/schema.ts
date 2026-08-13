@@ -17,6 +17,7 @@ export const games = sqliteTable("games", {
   createdAt: integer("created_at").notNull(),
   ownerUserId: text("owner_user_id"),
   occasion: text("occasion").notNull().default("anniversary"),
+  questPlanJson: text("quest_plan_json").notNull().default("[]"),
 });
 
 export const users = sqliteTable("users", {
