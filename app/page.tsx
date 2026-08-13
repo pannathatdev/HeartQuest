@@ -11,7 +11,15 @@ const themes = [
 const steps = ["เรื่องราว", "ความทรงจำ", "ตกแต่ง", "เผยแพร่"];
 
 type QuestStage={id:string;type:"npc"|"key"|"collect"|"quiz"|"ending";title:string;question?:string;answer?:string;decoys?:string[]};
-const stageCatalog=[{type:"npc",icon:"💬",name:"คุยกับ NPC"},{type:"key",icon:"🔑",name:"ตามหากุญแจ"},{type:"collect",icon:"💗",name:"เก็บความทรงจำ"},{type:"quiz",icon:"?",name:"ตอบคำถาม"},{type:"ending",icon:"✨",name:"ฉากจบ"}] as const;
+type GameCategory="all"|"story"|"memory"|"puzzle"|"finale";
+const gameCategories=[{id:"all",icon:"✦",name:"ทั้งหมด"},{id:"story",icon:"📖",name:"เนื้อเรื่อง"},{id:"memory",icon:"💗",name:"ความทรงจำ"},{id:"puzzle",icon:"🧩",name:"พัซเซิล"},{id:"finale",icon:"🎉",name:"ฉากจบ"}] as const;
+const stageCatalog=[
+  {type:"npc",category:"story",icon:"💬",name:"คุยกับ NPC",description:"รับคำใบ้และเปิดเรื่องราว",tone:"violet"},
+  {type:"collect",category:"memory",icon:"💗",name:"ล่าหัวใจ",description:"เดินสำรวจและเก็บความทรงจำ",tone:"pink"},
+  {type:"key",category:"puzzle",icon:"🔑",name:"กล่องกุญแจ",description:"เลือกกล่องเพื่อหากุญแจลับ",tone:"gold"},
+  {type:"quiz",category:"puzzle",icon:"?",name:"คำถามวัดใจ",description:"สร้างคำถามและตัวเลือกเอง",tone:"blue"},
+  {type:"ending",category:"finale",icon:"✨",name:"คำสารภาพสุดท้าย",description:"เปิดข้อความลับและคำตอบพิเศษ",tone:"rose"},
+] as const;
 
 export default function Home() {
   const [account, setAccount] = useState<{displayName:string;avatarUrl:string|null}|null>(null);
@@ -28,11 +36,13 @@ export default function Home() {
   const [referredBy, setReferredBy] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("https://www.youtube.com/watch?v=jfKfPfyJRdk");
   const [occasion,setOccasion]=useState("anniversary");
+  const [gameCategory,setGameCategory]=useState<GameCategory>("all");
   const [memories,setMemories]=useState(["วันแรกที่เราเจอกัน","ทริปที่ชอบที่สุด","สิ่งที่อยากบอกวันนี้"]);
 
   const [questPlan,setQuestPlan]=useState<QuestStage[]>([{id:"npc-1",type:"npc",title:"รับคำใบ้จากผู้พิทักษ์หัวใจ"},{id:"key-1",type:"key",title:"ตามหากุญแจลับ"},{id:"collect-1",type:"collect",title:"เก็บความทรงจำทั้งหมด"},{id:"quiz-1",type:"quiz",title:"คำถามวัดใจ",question:"ใครเป็นคนส่งภารกิจนี้มาให้?",answer:"ผู้สร้างเกม",decoys:["ผู้พิทักษ์หัวใจ","คนแปลกหน้าลึกลับ"]},{id:"ending-1",type:"ending",title:"เปิดข้อความจากหัวใจ"}]);
   const updateStage=(id:string,patch:Partial<QuestStage>)=>setQuestPlan(x=>x.map(s=>s.id===id?{...s,...patch}:s));
   const moveStage=(index:number,dir:number)=>setQuestPlan(x=>{const n=[...x],to=index+dir;if(to<0||to>=n.length)return x;[n[index],n[to]]=[n[to],n[index]];return n});
+  const addStage=(type:QuestStage["type"],name:string)=>setQuestPlan(x=>[...x,{id:crypto.randomUUID(),type,title:name,question:type==="quiz"?"เราพบกันครั้งแรกที่ไหน?":undefined,answer:type==="quiz"?"คำตอบที่ถูก":undefined,decoys:type==="quiz"?["ตัวเลือกที่ 2","ตัวเลือกที่ 3"]:undefined}]);
   const activeTheme = useMemo(() => themes.find((item) => item.id === theme)!, [theme]);
   const youtubeId = useMemo(() => {
     try {
@@ -116,9 +126,12 @@ export default function Home() {
 
             {step === 1 && (
               <div className="step-content">
-                <div className="studio-heading"><div><span>QUEST STUDIO</span><h2>ประกอบด่านของคุณ</h2></div><b>{questPlan.length}/8 ด่าน</b></div>
-                <div className="stage-catalog">{stageCatalog.map(c=><button type="button" key={c.type} disabled={questPlan.length>=8||((c.type==="ending"||c.type==="collect")&&questPlan.some(s=>s.type===c.type))} onClick={()=>setQuestPlan(x=>[...x,{id:crypto.randomUUID(),type:c.type,title:c.name,question:c.type==="quiz"?"เราพบกันครั้งแรกที่ไหน?":undefined,answer:c.type==="quiz"?"คำตอบที่ถูก":undefined,decoys:c.type==="quiz"?["ตัวเลือกที่ 2","ตัวเลือกที่ 3"]:undefined}])}><span>{c.icon}</span>{c.name}</button>)}</div>
-                <div className="stage-stack">{questPlan.map((s,i)=><article className="stage-card" key={s.id}><span className="stage-number">{i+1}</span><div className="stage-fields"><small>{stageCatalog.find(c=>c.type===s.type)?.name}</small><input value={s.title} maxLength={80} onChange={e=>updateStage(s.id,{title:e.target.value})}/>{s.type==="quiz"&&<><input value={s.question||""} placeholder="คำถาม" onChange={e=>updateStage(s.id,{question:e.target.value})}/><input value={s.answer||""} placeholder="คำตอบที่ถูก" onChange={e=>updateStage(s.id,{answer:e.target.value})}/><div className="decoy-row">{(s.decoys||[]).map((d,j)=><input key={j} value={d} placeholder={`ตัวเลือกหลอก ${j+1}`} onChange={e=>updateStage(s.id,{decoys:(s.decoys||[]).map((v,k)=>k===j?e.target.value:v)})}/>)}</div></>}</div><div className="stage-actions"><button type="button" disabled={i===0} onClick={()=>moveStage(i,-1)}>↑</button><button type="button" disabled={i===questPlan.length-1} onClick={()=>moveStage(i,1)}>↓</button><button type="button" disabled={s.type==="ending"||s.type==="collect"} onClick={()=>setQuestPlan(x=>x.filter(v=>v.id!==s.id))}>×</button></div></article>)}</div>
+                <div className="studio-heading"><div><span>MINI GAME LIBRARY</span><h2>สร้างเส้นทางรักในแบบของคุณ</h2><p>เลือกมินิเกม แล้วเรียงให้กลายเป็นเรื่องเดียวกัน</p></div><b>{questPlan.length}/8 ด่าน</b></div>
+                <div className="game-category-tabs">{gameCategories.map(c=><button type="button" key={c.id} className={gameCategory===c.id?"active":""} onClick={()=>setGameCategory(c.id)}><span>{c.icon}</span>{c.name}</button>)}</div>
+                <div className="quest-builder-grid">
+                  <section className="mini-game-library"><div className="library-label"><b>เลือกมินิเกม</b><small>แตะ + เพื่อเพิ่มลงเส้นทาง</small></div><div className="stage-catalog">{stageCatalog.filter(c=>gameCategory==="all"||c.category===gameCategory).map(c=>{const used=questPlan.filter(s=>s.type===c.type).length;const unique=c.type==="ending"||c.type==="collect";return <article className={`game-tile ${c.tone}`} key={c.type}><div className="game-tile-icon">{c.icon}</div><div><small>{gameCategories.find(g=>g.id===c.category)?.name}</small><h3>{c.name}</h3><p>{c.description}</p></div><button type="button" aria-label={`เพิ่ม ${c.name}`} disabled={questPlan.length>=8||(unique&&used>0)} onClick={()=>addStage(c.type,c.name)}>{unique&&used>0?"เพิ่มแล้ว":"＋ เพิ่มด่าน"}</button></article>})}</div></section>
+                  <section className="route-planner"><div className="library-label"><b>เส้นทางของผู้เล่น</b><small>เรียงลำดับได้สูงสุด 8 ด่าน</small></div><div className="stage-stack">{questPlan.map((s,i)=>{const info=stageCatalog.find(c=>c.type===s.type);return <article className="stage-card" key={s.id}><span className="stage-number">{i+1}</span><span className="route-icon">{info?.icon}</span><div className="stage-fields"><small>{info?.name}</small><input aria-label="ชื่อด่าน" value={s.title} maxLength={80} onChange={e=>updateStage(s.id,{title:e.target.value})}/>{s.type==="quiz"&&<div className="quiz-editor"><input value={s.question||""} placeholder="คำถาม" onChange={e=>updateStage(s.id,{question:e.target.value})}/><input value={s.answer||""} placeholder="คำตอบที่ถูก" onChange={e=>updateStage(s.id,{answer:e.target.value})}/><div className="decoy-row">{(s.decoys||[]).map((d,j)=><input key={j} value={d} placeholder={`ตัวเลือกหลอก ${j+1}`} onChange={e=>updateStage(s.id,{decoys:(s.decoys||[]).map((v,k)=>k===j?e.target.value:v)})}/>)}</div></div>}</div><div className="stage-actions"><button type="button" aria-label="เลื่อนขึ้น" disabled={i===0} onClick={()=>moveStage(i,-1)}>↑</button><button type="button" aria-label="เลื่อนลง" disabled={i===questPlan.length-1} onClick={()=>moveStage(i,1)}>↓</button><button type="button" aria-label="ลบด่าน" disabled={s.type==="ending"||s.type==="collect"} onClick={()=>setQuestPlan(x=>x.filter(v=>v.id!==s.id))}>×</button></div></article>})}</div></section>
+                </div>
                 <div className="section-title"><span>02</span><div><h2>ซ่อนความทรงจำ</h2><p>เพิ่มได้สูงสุด 10 จุด แต่ละจุดแก้ข้อความหรือลบได้</p></div></div>
                 {memories.map((item,index)=><div className={`memory-editor ${memory===index?"selected":""}`} key={index} onClick={()=>setMemory(index)}><span className="pixel-heart">♥</span><label><small>MEMORY {String(index+1).padStart(2,"0")}</small><textarea value={item} maxLength={120} onChange={e=>setMemories(x=>x.map((v,i)=>i===index?e.target.value:v))}/></label><button type="button" aria-label="ลบความทรงจำ" disabled={memories.length<=1} onClick={e=>{e.stopPropagation();setMemories(x=>x.filter((_,i)=>i!==index));setMemory(0)}}>×</button></div>)}
                 <button type="button" className="add-memory" disabled={memories.length>=10} onClick={()=>{setMemories(x=>[...x,`ความทรงจำที่ ${x.length+1}`]);setMemory(memories.length)}}>＋ เพิ่มความทรงจำ ({memories.length}/10)</button>
