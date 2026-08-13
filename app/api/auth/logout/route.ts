@@ -1,0 +1,2 @@
+import { env } from "cloudflare:workers";import { clearSessionCookie, sha256 } from "../../../../lib/auth";
+export async function POST(request:Request){const m=request.headers.get("cookie")?.match(/(?:^|;\s*)hq_session=([^;]+)/);if(m)await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await sha256(decodeURIComponent(m[1]))).run();return new Response(null,{status:204,headers:{"set-cookie":clearSessionCookie()}})}

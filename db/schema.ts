@@ -15,7 +15,28 @@ export const games = sqliteTable("games", {
   playCount: integer("play_count").notNull().default(0),
   completionCount: integer("completion_count").notNull().default(0),
   createdAt: integer("created_at").notNull(),
+  ownerUserId: text("owner_user_id"),
 });
+
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  googleSubject: text("google_subject").notNull().unique(),
+  email: text("email").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  avatarUrl: text("avatar_url"),
+  referralCode: text("referral_code").notNull().unique(),
+  heartPoints: integer("heart_points").notNull().default(0),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
+
+export const sessions = sqliteTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: integer("expires_at").notNull(),
+  createdAt: integer("created_at").notNull(),
+}, (table) => [index("idx_sessions_user").on(table.userId), index("idx_sessions_expiry").on(table.expiresAt)]);
 
 export const playEvents = sqliteTable("play_events", {
   id: text("id").primaryKey(),
@@ -46,4 +67,5 @@ export const payments = sqliteTable("payments", {
   reviewedAt: integer("reviewed_at"),
   reviewedBy: text("reviewed_by"),
   createdAt: integer("created_at").notNull(),
+  userId: text("user_id"),
 }, (table) => [index("idx_payments_status_created").on(table.status, table.createdAt), index("idx_payments_game").on(table.gameId)]);

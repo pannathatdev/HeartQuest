@@ -1,0 +1,12 @@
+CREATE TABLE `users` (`id` text PRIMARY KEY NOT NULL,`google_subject` text NOT NULL,`email` text NOT NULL,`display_name` text NOT NULL,`avatar_url` text,`referral_code` text NOT NULL,`heart_points` integer DEFAULT 0 NOT NULL,`created_at` integer NOT NULL,`updated_at` integer NOT NULL);
+CREATE UNIQUE INDEX `users_google_subject_unique` ON `users` (`google_subject`);
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
+CREATE UNIQUE INDEX `users_referral_code_unique` ON `users` (`referral_code`);
+CREATE TABLE `sessions` (`id` text PRIMARY KEY NOT NULL,`user_id` text NOT NULL,`token_hash` text NOT NULL,`expires_at` integer NOT NULL,`created_at` integer NOT NULL);
+CREATE UNIQUE INDEX `sessions_token_hash_unique` ON `sessions` (`token_hash`);
+CREATE INDEX `idx_sessions_user` ON `sessions` (`user_id`);
+CREATE INDEX `idx_sessions_expiry` ON `sessions` (`expires_at`);
+ALTER TABLE `games` ADD `owner_user_id` text;
+CREATE INDEX `idx_games_owner_created` ON `games` (`owner_user_id`,`created_at`);
+ALTER TABLE `payments` ADD `user_id` text;
+CREATE INDEX `idx_payments_user_created` ON `payments` (`user_id`,`created_at`);

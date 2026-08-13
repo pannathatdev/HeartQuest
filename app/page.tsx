@@ -11,6 +11,7 @@ const themes = [
 const steps = ["เรื่องราว", "ความทรงจำ", "ตกแต่ง", "เผยแพร่"];
 
 export default function Home() {
+  const [account, setAccount] = useState<{displayName:string;avatarUrl:string|null}|null>(null);
   const [step, setStep] = useState(0);
   const [creator, setCreator] = useState("พีโป้");
   const [partner, setPartner] = useState("คนพิเศษ");
@@ -37,7 +38,7 @@ export default function Home() {
     return "";
   }, [youtubeUrl]);
 
-  useEffect(() => { setReferredBy(new URLSearchParams(window.location.search).get("ref") || ""); }, []);
+  useEffect(() => { setReferredBy(new URLSearchParams(window.location.search).get("ref") || ""); fetch("/api/auth/me").then(r=>r.json()).then(d=>setAccount(d.user)).catch(()=>{}); }, []);
 
   const nextStep = async () => {
     if (step < steps.length - 1) setStep((value) => value + 1);
@@ -45,6 +46,7 @@ export default function Home() {
       setPublishing(true); setPublishError("");
       try {
         const response = await fetch("/api/games", { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({ creatorName:creator, partnerName:partner, message, theme, youtubeUrl, memories:["วันแรกที่เราเจอกัน", "ทริปที่ชอบที่สุด", "สิ่งที่อยากบอกวันนี้"], referredBy }) });
+        if(response.status===401){window.location.href="/api/auth/google?returnTo=/";return;}
         const data = await response.json() as {gameUrl:string;editUrl:string;referralUrl:string;referralCode:string;error?:string};
         if(!response.ok) throw new Error(data.error || "สร้างเกมไม่สำเร็จ");
         setPublished(data); setGenerated(true);
@@ -67,8 +69,7 @@ export default function Home() {
         </a>
         <div className="top-actions">
           <span className="saved"><i /> บันทึกแล้ว</span>
-          <button className="ghost-button">เกมของฉัน <span>⌄</span></button>
-          <button className="avatar" aria-label="เปิดบัญชี">PP</button>
+          {account ? <><a className="ghost-button" href="/dashboard">เกมของฉัน</a><a className="avatar" href="/dashboard" aria-label="เปิดบัญชี">{account.avatarUrl?<img src={account.avatarUrl} alt=""/>:account.displayName.slice(0,2).toUpperCase()}</a></> : <a className="google-login" href="/api/auth/google?returnTo=/">เข้าสู่ระบบด้วย Google</a>}
         </div>
       </header>
 
