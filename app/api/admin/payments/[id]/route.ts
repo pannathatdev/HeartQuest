@@ -1,0 +1,3 @@
+import { env } from "cloudflare:workers";
+import { requireAdmin } from "../../../../../lib/admin";
+export async function PATCH(request:Request,context:{params:Promise<{id:string}>}){const admin=await requireAdmin();if(!admin)return Response.json({error:"forbidden"},{status:403});const {id}=await context.params;const body=await request.json() as {status?:string};if(!["approved","rejected"].includes(body.status||""))return Response.json({error:"invalid status"},{status:400});await env.DB.prepare("UPDATE payments SET status = ?, reviewed_at = ?, reviewed_by = ? WHERE id = ? AND status = 'pending_review'").bind(body.status,Date.now(),admin,id).run();return Response.json({ok:true})}

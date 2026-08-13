@@ -1,0 +1,3 @@
+import { env } from "cloudflare:workers";
+import { requireAdmin } from "../../../../../../lib/admin";
+export async function GET(_:Request,context:{params:Promise<{id:string}>}){if(!await requireAdmin())return new Response("Forbidden",{status:403});const {id}=await context.params;const row=await env.DB.prepare("SELECT slip_key FROM payments WHERE id = ?").bind(id).first<{slip_key:string|null}>();if(!row?.slip_key)return new Response("Not found",{status:404});const object=await env.SLIPS.get(row.slip_key);if(!object)return new Response("Not found",{status:404});return new Response(object.body,{headers:{"content-type":object.httpMetadata?.contentType||"image/jpeg","cache-control":"private, no-store"}})}

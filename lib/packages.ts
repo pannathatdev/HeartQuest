@@ -1,0 +1,1 @@
+export const premiumPackages:Record<string,{name:string;amountSatang:number}>={theme_pack:{name:"Premium Theme Pack",amountSatang:4900},story_pack:{name:"IG Story Pack",amountSatang:2900},forever:{name:"Forever Quest",amountSatang:9900}};

@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "heartquest",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "heartquest-db",
+      "database_id": "23c115b6-1c6d-45de-8780-c820e60eb0ac",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

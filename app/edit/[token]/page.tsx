@@ -1,0 +1,4 @@
+import { env } from "cloudflare:workers";
+import { notFound } from "next/navigation";
+import EditClient from "./EditClient";
+export default async function EditPage({params}:{params:Promise<{token:string}>}){const {token}=await params;const game=await env.DB.prepare("SELECT slug, partner_name, message, youtube_url, play_count, completion_count, referral_code, (SELECT COALESCE(SUM(points),0) FROM referral_events WHERE referral_code = games.referral_code) AS heart_points FROM games WHERE edit_token = ?").bind(token).first<{slug:string;partner_name:string;message:string;youtube_url:string|null;play_count:number;completion_count:number;referral_code:string;heart_points:number}>();if(!game)notFound();return <EditClient token={token} game={{slug:game.slug,partner:game.partner_name,message:game.message,youtubeUrl:game.youtube_url||"",plays:game.play_count,completions:game.completion_count,referralCode:game.referral_code,heartPoints:game.heart_points}}/>;}

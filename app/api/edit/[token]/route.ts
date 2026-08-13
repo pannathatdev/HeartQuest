@@ -1,0 +1,3 @@
+import { env } from "cloudflare:workers";
+const clean=(value:unknown,max:number)=>String(value||"").trim().slice(0,max);
+export async function PATCH(request:Request,context:{params:Promise<{token:string}>}){const {token}=await context.params;const body=await request.json() as Record<string,unknown>;const message=clean(body.message,180),youtubeUrl=clean(body.youtubeUrl,300)||null;if(!message)return Response.json({error:"ข้อความต้องไม่ว่าง"},{status:400});const result=await env.DB.prepare("UPDATE games SET message = ?, youtube_url = ? WHERE edit_token = ?").bind(message,youtubeUrl,token).run();if(!result.meta.changes)return Response.json({error:"ไม่พบสิทธิ์แก้ไขเกม"},{status:404});return Response.json({ok:true});}

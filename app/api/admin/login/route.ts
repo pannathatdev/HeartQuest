@@ -1,0 +1,2 @@
+import { adminSessionToken, validAdminPassword } from "../../../../lib/admin";
+export async function POST(request:Request){const body=await request.json() as {password?:string};if(!await validAdminPassword(String(body.password||"")))return Response.json({error:"invalid"},{status:401});const response=Response.json({ok:true});response.headers.set("set-cookie",`hq_admin=${await adminSessionToken()}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`);return response}
