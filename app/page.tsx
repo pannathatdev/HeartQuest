@@ -16,17 +16,17 @@ type GameCategory="all"|"story"|"memory"|"puzzle"|"action"|"finale";
 const gameCategories=[{id:"all",icon:"✦",name:"ทั้งหมด"},{id:"story",icon:"📖",name:"เนื้อเรื่อง"},{id:"memory",icon:"💗",name:"ความทรงจำ"},{id:"puzzle",icon:"🧩",name:"พัซเซิล"},{id:"action",icon:"⚡",name:"แอ็กชัน"},{id:"finale",icon:"🎉",name:"ฉากจบ"}] as const;
 const stageCatalog=[
   {type:"npc",category:"story",icon:"💬",name:"คุยกับ NPC",description:"รับคำใบ้และเปิดเรื่องราว",tone:"violet"},
-  {type:"collect",category:"memory",icon:"💗",name:"ล่าหัวใจ",description:"เดินสำรวจและเก็บความทรงจำ",tone:"pink"},
+  {type:"collect",category:"memory",icon:"⭐",name:"แนะนำ · ล่าหัวใจ",description:"ใช้ฟรี · เดินสำรวจและเก็บความทรงจำ",tone:"pink",recommended:true},
   {type:"key",category:"puzzle",icon:"🔑",name:"กล่องกุญแจ",description:"เลือกกล่องเพื่อหากุญแจลับ",tone:"gold"},
   {type:"quiz",category:"puzzle",icon:"?",name:"คำถามวัดใจ",description:"สร้างคำถามและตัวเลือกเอง",tone:"blue"},
   {type:"match",category:"memory",icon:"🃏",name:"จับคู่ความทรงจำ",description:"เปิดการ์ดและตามหาคู่ที่ตรงกัน",tone:"violet"},
   {type:"timeline",category:"memory",icon:"🗓️",name:"เรียงไทม์ไลน์",description:"แตะเหตุการณ์ตามลำดับเรื่องราว",tone:"gold"},
   {type:"catch",category:"action",icon:"💞",name:"ฝนหัวใจ",description:"แตะหัวใจที่ปรากฏให้ครบก่อนผ่าน",tone:"pink"},
   {type:"rhythm",category:"action",icon:"🎵",name:"จังหวะหัวใจ",description:"แตะตามจังหวะให้หัวใจเต้นพร้อมกัน",tone:"blue"},
-  {type:"jigsaw",category:"puzzle",icon:"🧩",name:"จิ๊กซอว์รูปคู่",description:"เปิดชิ้นส่วนเพื่อประกอบรูปพิเศษ",tone:"violet"},
-  {type:"scratch",category:"memory",icon:"🎟️",name:"การ์ดขูด",description:"ขูดทีละช่องเพื่อเปิดรูปและข้อความ",tone:"gold"},
+  {type:"jigsaw",category:"puzzle",icon:"⭐",name:"แนะนำ · จิ๊กซอว์รูปคู่",description:"ใช้ฟรี · เปิดชิ้นส่วนเพื่อประกอบรูปพิเศษ",tone:"violet",recommended:true},
+  {type:"scratch",category:"memory",icon:"⭐",name:"แนะนำ · การ์ดขูด",description:"ใช้ฟรี · ขูดทีละช่องเพื่อเปิดรูปและข้อความ",tone:"gold",recommended:true},
   {type:"secret",category:"puzzle",icon:"🔐",name:"รหัสลับ",description:"กรอกรหัสที่รู้กันสองคนเพื่อผ่าน",tone:"rose"},
-  {type:"ending",category:"finale",icon:"✨",name:"คำสารภาพสุดท้าย",description:"เปิดข้อความลับและคำตอบพิเศษ",tone:"rose"},
+  {type:"ending",category:"finale",icon:"⭐",name:"แนะนำ · คำสารภาพสุดท้าย",description:"ใช้ฟรี · เปิดข้อความลับและคำตอบพิเศษ",tone:"rose",recommended:true},
 ] as const;
 const storySuggestions=["มีภารกิจลับอยากให้เธอลองเล่น","ขอบคุณที่เป็นความทรงจำที่ดีที่สุด","เดินทางมาถึงด่านสุดท้ายแล้วจะมีคำตอบรออยู่"];
 const stageSuggestions:Record<QuestStage["type"],{titles:string[];instructions:string[]}>= {
