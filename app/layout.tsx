@@ -3,6 +3,8 @@ import "./globals.css";
 import "./minigames.css";
 import "./studio.css";
 import "./suggestions.css";
+import "./wow-games.css";
+import "./secret-builder.css";
 
 export const metadata: Metadata = {
   title: "HeartQuest — เปลี่ยนความทรงจำให้เป็นเกมรัก",
