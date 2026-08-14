@@ -1,3 +1,0 @@
-import {env} from "cloudflare:workers";
-import {requireUser} from "../../../lib/auth";
-export async function POST(request:Request){try{await requireUser(request);const form=await request.formData(),file=form.get("image");if(!(file instanceof File)||!file.type.startsWith("image/")||file.size>5*1024*1024)return Response.json({error:"รองรับ JPG, PNG หรือ WebP ไม่เกิน 5 MB"},{status:400});const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg",key=`${crypto.randomUUID()}.${ext}`;await env.SLIPS.put(`media/${key}`,file.stream(),{httpMetadata:{contentType:file.type}});return Response.json({url:`/api/media/${key}`})}catch(error){if(error instanceof Response)return error;return Response.json({error:"อัปโหลดรูปไม่สำเร็จ"},{status:500})}}

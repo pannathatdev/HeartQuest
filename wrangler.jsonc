@@ -12,11 +12,5 @@
       "database_id": "23c115b6-1c6d-45de-8780-c820e60eb0ac",
       "migrations_dir": "drizzle"
     }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "SLIPS",
-      "bucket_name": "heartquest-slips"
-    }
   ]
 }
