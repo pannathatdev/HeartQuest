@@ -6,6 +6,8 @@ import "./suggestions.css";
 import "./wow-games.css";
 import "./secret-builder.css";
 import "./secret-fix.css";
+import "./wow-settings.css";
+import "./wow-game.css";
 
 export const metadata: Metadata = {
   title: "HeartQuest — เปลี่ยนความทรงจำให้เป็นเกมรัก",
